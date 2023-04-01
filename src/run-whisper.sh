@@ -52,6 +52,7 @@ model_dir="$(dirname $0)/../models"
 model="large-v2"
 output_format="srt"
 is_output_ass=1
+language="ja"
 audios=()
 
 options="-o ./output --model_dir ./model"
@@ -85,6 +86,10 @@ while [[ $# -gt 0 ]]; do
       fi
       shift 2
       ;;
+    --language)
+      language="$2"
+      shift 2
+      ;;
     -*)
       options="$options $1 $2"
       shift 2
@@ -98,6 +103,7 @@ done
 
 options="$options --model $model"
 options="$options --output_format $output_format"
+options="$options --language $language"
 
 for audio in $audios; do
   if [ "${audio:0:1}" != "/" ]; then
