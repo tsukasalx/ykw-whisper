@@ -57,6 +57,7 @@ audios=()
 
 options="-o ./output --model_dir ./model"
 
+# Parse command-line options
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
@@ -105,7 +106,9 @@ options="$options --model $model"
 options="$options --output_format $output_format"
 options="$options --language $language"
 
+# Process audio files
 for audio in $audios; do
+  # Make sure we use the absolutely path
   if [ "${audio:0:1}" != "/" ]; then
     audio="$PWD/$audio"
   fi
@@ -115,6 +118,7 @@ for audio in $audios; do
   if [ "${model_dir:0:1}" != "/" ]; then
     model_dir="$PWD/$model_dir"
   fi
+  # Process the audio in a new container
   docker run --rm \
               -v $audio:/app/input/$(basename $audio) \
               -v $output_dir:/app/output \
@@ -125,6 +129,7 @@ for audio in $audios; do
     exit 1
   fi
 
+  # Generate ass file if need
   if [[ $is_output_ass -eq 1 ]]; then
     file_name=$(basename $audio)
     file_name_without_ext=${file_name%.*}
