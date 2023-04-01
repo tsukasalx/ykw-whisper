@@ -50,7 +50,8 @@ fi
 output_dir="."
 model_dir="$(dirname $0)/../models"
 model="large-v2"
-output_format="txt"
+output_format="srt"
+is_output_ass=1
 audios=()
 
 options="-o ./output --model_dir ./model"
@@ -59,7 +60,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
       docker run --rm ykw/whisper whisper --help
-      break
+      exit 0
       ;;
     -o|--output_dir)
       output_dir="$2"
@@ -74,7 +75,14 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --output_format)
-      output_format="$2"
+      if [[ $2 == "ass" ]]; then
+        output_format="$output_format"
+      elif [[ $2 == "all" ]]; then
+        output_format="$2"
+      else
+        output_format="$2"
+        is_output_ass=0
+      fi
       shift 2
       ;;
     -*)
@@ -92,20 +100,38 @@ options="$options --model $model"
 options="$options --output_format $output_format"
 
 for audio in $audios; do
-    if [ "${audio:0:1}" != "/" ]; then
-        audio="$PWD/$audio"
+  if [ "${audio:0:1}" != "/" ]; then
+    audio="$PWD/$audio"
+  fi
+  if [ "${output_dir:0:1}" != "/" ]; then
+    output_dir="$PWD/$output_dir"
+  fi
+  if [ "${model_dir:0:1}" != "/" ]; then
+    model_dir="$PWD/$model_dir"
+  fi
+  docker run --rm \
+              -v $audio:/app/input/$(basename $audio) \
+              -v $output_dir:/app/output \
+              -v $model_dir:/app/model \
+              ykw/whisper whisper $options /app/input/$(basename $audio)
+
+  if [[ $? -ne 0 ]]; then
+    exit 1
+  fi
+
+  if [[ $is_output_ass -eq 1 ]]; then
+    file_name=$(basename $audio)
+    file_name_without_ext=${file_name%.*}
+    ffmpeg -y -i $output_dir/$file_name_without_ext.srt $output_dir/$file_name_without_ext.ass >/dev/null 2>&1
+
+    if [[ $? -ne 0 ]]; then
+      exit 1
     fi
-    if [ "${output_dir:0:1}" != "/" ]; then
-        output_dir="$PWD/$output_dir"
+
+    if [[ $output_format == "srt" ]]; then
+      rm $output_dir/$file_name_without_ext.srt
     fi
-    if [ "${model_dir:0:1}" != "/" ]; then
-        model_dir="$PWD/$model_dir"
-    fi
-    docker run --rm \
-               -v $audio:/app/input/$(basename $audio) \
-               -v $output_dir:/app/output \
-               -v $model_dir:/app/model \
-               ykw/whisper whisper $options /app/input/$(basename $audio)
+  fi
 done
 
 echo "All steps completed successfully."
