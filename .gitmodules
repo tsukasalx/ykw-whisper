@@ -1,0 +1,3 @@
+[submodule "src/shell_utils"]
+	path = src/shell_utils
+	url = ssh://git@gitea.ssh.tsukasalx.xyz:222/tsukasalx/shell_utils.git
