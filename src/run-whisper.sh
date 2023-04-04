@@ -49,7 +49,7 @@ fi
 
 output_dir="."
 model_dir="$(dirname $0)/../models"
-model="large-v2"
+model="large"
 output_format="srt"
 is_output_ass=1
 language="ja"
@@ -61,6 +61,18 @@ options="-o ./output --model_dir ./model"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
+      echo "+--------------------------------------------------------------------------------------------------------------+"
+      echo "| Available models and languages                                                                               |"
+      echo "|--------------------------------------------------------------------------------------------------------------|"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "Size" "Parameters" "English-only model" "Multilingual model" "Required VRAM" "Relative speed"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "----------" "---------------" "-------------------" "-------------------" "---------------" "---------------"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "tiny" "39 M" "tiny.en" "tiny" "~1 GB" "~32x"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "base" "74 M" "base.en" "base" "~1 GB" "~16x"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "small" "244 M" "small.en" "small" "~2 GB" "~6x"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "medium" "769 M" "medium.en" "medium" "~5 GB" "~2x"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "large" "1550 M" "N/A" "large" "~10 GB" "1x"
+      echo "+--------------------------------------------------------------------------------------------------------------+"
+
       docker run --rm ykw/whisper whisper --help
       exit 0
       ;;
