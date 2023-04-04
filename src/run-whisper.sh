@@ -107,7 +107,11 @@ options="$options --output_format $output_format"
 options="$options --language $language"
 
 # Process audio files
+total_elapsed_time=0
 for audio in $audios; do
+
+  start_time=$(date +%s)
+  
   # Make sure we use the absolutely path
   if [ "${audio:0:1}" != "/" ]; then
     audio="$PWD/$audio"
@@ -119,12 +123,13 @@ for audio in $audios; do
     model_dir="$PWD/$model_dir"
   fi
   # Process the audio in a new container
-  docker run --rm \
-              -v $audio:/app/input/$(basename $audio) \
-              -v $output_dir:/app/output \
-              -v $model_dir:/app/model \
-              ykw/whisper whisper $options /app/input/$(basename $audio)
-
+  docker run --gpus all \
+             --rm \
+             -v "$audio:/app/input/$(basename $audio)" \
+             -v "$output_dir:/app/output" \
+             -v "$model_dir:/app/model" \
+             ykw/whisper whisper $options /app/input/$(basename $audio)
+                  
   if [[ $? -ne 0 ]]; then
     exit 1
   fi
@@ -133,16 +138,23 @@ for audio in $audios; do
   if [[ $is_output_ass -eq 1 ]]; then
     file_name=$(basename $audio)
     file_name_without_ext=${file_name%.*}
-    ffmpeg -y -i $output_dir/$file_name_without_ext.srt $output_dir/$file_name_without_ext.ass >/dev/null 2>&1
+    ffmpeg -y -i "$output_dir/$file_name_without_ext.srt" "$output_dir/$file_name_without_ext.ass" >/dev/null 2>&1
+    command > /dev/tty 2>&1
 
     if [[ $? -ne 0 ]]; then
       exit 1
     fi
 
     if [[ $output_format == "srt" ]]; then
-      rm $output_dir/$file_name_without_ext.srt
+      rm "$output_dir/$file_name_without_ext.srt"
     fi
   fi
+
+  end_time=$(($(date +%s) - start_time))
+  echo "$audio elapsed time: $(date -d@${end_time} -u +%H:%M:%S)"
+  elapsed_time=$((elapsed_time + end_time))
+
 done
+echo "Total elapsed time: $(date -d@${elapsed_time} -u +%H:%M:%S)"
 
 echo "All steps completed successfully."
