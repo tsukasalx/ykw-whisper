@@ -3,4 +3,4 @@ version: '3'
 services:
   whisper:
     build: .
-    image: ykw/whisper
+    image: ykw/whisper${ubuntu_version}

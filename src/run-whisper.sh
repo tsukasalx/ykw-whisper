@@ -2,24 +2,24 @@
 
 # Check if docker is installed, if not, install the latest version
 if ! [ -x "$(command -v docker)" ]; then
-  echo 'Error: docker is not installed.' >&2
-  echo 'Installing docker...'
+  echo "Error: docker is not installed." >&2
+  echo "Installing docker..."
   curl -fsSL https://get.docker.com -o get-docker.sh
   sh get-docker.sh
 fi
 
 # Verify if installation is successful, if not, exit with error
 if ! [ -x "$(command -v docker)" ]; then
-  echo 'Error: docker installation failed.' >&2
+  echo "Error: docker installation failed." >&2
   exit 1
 else
-  echo 'docker installed successfully.'
+  echo "docker installed successfully."
 fi
 
 # Check if docker-compose is installed, if not, install the latest version
 if ! [ -x "$(command -v docker-compose)" ]; then
-  echo 'Error: docker-compose is not installed.' >&2
-  echo 'Installing docker-compose...'
+  echo "Error: docker-compose is not installed." >&2
+  echo "Installing docker-compose..."
   curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) \
        -o /usr/local/bin/docker-compose
   chmod +x /usr/local/bin/docker-compose
@@ -27,24 +27,28 @@ fi
 
 # Verify if installation is successful, if not, exit with error
 if ! [ -x "$(command -v docker-compose)" ]; then
-  echo 'Error: docker-compose installation failed.' >&2
+  echo "Error: docker-compose installation failed." >&2
   exit 1
 else
-  echo 'docker-compose installed successfully.'
+  echo "docker-compose installed successfully."
 fi
 
 # Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
-if ! docker images | grep -q ykw/whisper; then
-  echo 'ykw/whisper image not found. Building...'
-  (cd $(dirname "$0")/../docker && docker-compose build)
+ubuntu_version=$(lsb_release -sr)
+export ubuntu_version
+whisper_image_name=ykw/whisper$ubuntu_version
+
+if ! docker images | grep -q $whisper_image_name; then
+  echo "$whisper_image_name image not found. Building..."
+  (cd $(dirname "$0")/../docker && docker-compose build --build-arg UBUNTU_VERSION=$ubuntu_version)
 fi
 
 # Verify if build is successful, if not, exit with error
-if ! docker images | grep -q ykw/whisper; then
-  echo 'Error: ykw/whisper build failed.' >&2
+if ! docker images | grep -q $whisper_image_name; then
+  echo "Error: $whisper_image_name build failed." >&2
   exit 1
 else
-  echo 'ykw/whisper build successfully.'
+  echo "$whisper_image_name build successfully."
 fi
 
 output_dir="."
@@ -73,7 +77,7 @@ while [[ $# -gt 0 ]]; do
       printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "large" "1550 M" "N/A" "large" "~10 GB" "1x"
       echo "+--------------------------------------------------------------------------------------------------------------+"
 
-      docker run --rm ykw/whisper whisper --help
+      docker run --rm $whisper_image_name whisper --help
       exit 0
       ;;
     -o|--output_dir)
@@ -140,7 +144,7 @@ for audio in $audios; do
              -v "$audio:/app/input/$(basename $audio)" \
              -v "$output_dir:/app/output" \
              -v "$model_dir:/app/model" \
-             ykw/whisper whisper $options /app/input/$(basename $audio)
+             $whisper_image_name whisper $options /app/input/$(basename $audio)
                   
   if [[ $? -ne 0 ]]; then
     exit 1
@@ -162,11 +166,11 @@ for audio in $audios; do
     fi
   fi
 
-  end_time=$(($(date +%s) - start_time))
-  echo "$audio elapsed time: $(date -d@${end_time} -u +%H:%M:%S)"
-  elapsed_time=$((elapsed_time + end_time))
+  elapsed_time=$(($(date +%s) - start_time))
+  echo "$audio elapsed time: $(date -d@${elapsed_time} -u +%H:%M:%S)"
+  total_elapsed_time=$((total_elapsed_time + elapsed_time))
 
 done
-echo "Total elapsed time: $(date -d@${elapsed_time} -u +%H:%M:%S)"
+echo "Total elapsed time: $(date -d@${total_elapsed_time} -u +%H:%M:%S)"
 
 echo "All steps completed successfully."

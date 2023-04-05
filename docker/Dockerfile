@@ -1,4 +1,6 @@
-FROM nvidia/cuda:12.1.0-base-ubuntu20.04
+ARG UBUNTU_VERSION
+
+FROM nvidia/cuda:12.1.0-base-ubuntu${UBUNTU_VERSION}
 
 WORKDIR /app
 
@@ -8,6 +10,8 @@ RUN apt update
 RUN apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" keyboard-configuration
 RUN apt install -y git
 RUN apt install -y ffmpeg
+RUN apt install -y software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt install -y curl
 RUN apt install -y python3.9
 RUN apt install -y python3.9-distutils
