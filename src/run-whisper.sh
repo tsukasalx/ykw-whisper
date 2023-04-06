@@ -112,7 +112,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     *)
-      audios+="$1 "
+      audios+=("$1")
       shift
       ;;
   esac
@@ -123,28 +123,36 @@ options="$options --output_format $output_format"
 options="$options --language $language"
 
 # Process audio files
+if [ "${output_dir:0:1}" != "/" ]; then
+  output_dir="$PWD/$output_dir"
+fi
+output_dir=$(realpath "$output_dir")
+if [ "${model_dir:0:1}" != "/" ]; then
+  model_dir="$PWD/$model_dir"
+fi
+model_dir=$(realpath "$model_dir")
+
 total_elapsed_time=0
-for audio in $audios; do
+for audio in "${audios[@]}"; do
 
   start_time=$(date +%s)
-  
+
   # Make sure we use the absolutely path
   if [ "${audio:0:1}" != "/" ]; then
-    audio="$PWD/$audio"
+    host_audio="$PWD/$audio"
+    host_audio=$(realpath "$host_audio")
+  else
+    host_audio="$audio"
   fi
-  if [ "${output_dir:0:1}" != "/" ]; then
-    output_dir="$PWD/$output_dir"
-  fi
-  if [ "${model_dir:0:1}" != "/" ]; then
-    model_dir="$PWD/$model_dir"
-  fi
+  docker_audio=/app/input/$(basename "$audio")
+
   # Process the audio in a new container
   docker run --gpus all \
              --rm \
-             -v "$audio:/app/input/$(basename $audio)" \
+             -v "$host_audio:$docker_audio:ro" \
              -v "$output_dir:/app/output" \
-             -v "$model_dir:/app/model" \
-             $whisper_image_name whisper $options /app/input/$(basename $audio)
+             -v "$model_dir:/app/model:ro" \
+             $whisper_image_name whisper $options "$docker_audio"
                   
   if [[ $? -ne 0 ]]; then
     exit 1
@@ -152,11 +160,14 @@ for audio in $audios; do
 
   # Generate ass file if need
   if [[ $is_output_ass -eq 1 ]]; then
-    file_name=$(basename $audio)
+    file_name=$(basename "$host_audio")
     file_name_without_ext=${file_name%.*}
-    ffmpeg -y -i "$output_dir/$file_name_without_ext.srt" "$output_dir/$file_name_without_ext.ass" >/dev/null 2>&1
-    command > /dev/tty 2>&1
-
+    docker run --rm \
+               -v "$output_dir:/app/output" \
+               $whisper_image_name ffmpeg -y -i \
+               "/app/output/$file_name_without_ext.srt" \
+               "/app/output/$file_name_without_ext.ass" >/dev/null 2>&1
+    
     if [[ $? -ne 0 ]]; then
       exit 1
     fi
