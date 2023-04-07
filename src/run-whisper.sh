@@ -127,6 +127,7 @@ if [ "${output_dir:0:1}" != "/" ]; then
   output_dir="$PWD/$output_dir"
 fi
 output_dir=$(realpath "$output_dir")
+tmp_dir=/tmp/$(uuidgen)
 if [ "${model_dir:0:1}" != "/" ]; then
   model_dir="$PWD/$model_dir"
 fi
@@ -150,7 +151,7 @@ for audio in "${audios[@]}"; do
   docker run --gpus all \
              --rm \
              -v "$host_audio:$docker_audio:ro" \
-             -v "$output_dir:/app/output" \
+             -v "$tmp_dir:/app/output" \
              -v "$model_dir:/app/model:ro" \
              $whisper_image_name whisper $options "$docker_audio"
                   
@@ -163,7 +164,7 @@ for audio in "${audios[@]}"; do
     file_name=$(basename "$host_audio")
     file_name_without_ext=${file_name%.*}
     docker run --rm \
-               -v "$output_dir:/app/output" \
+               -v "$tmp_dir:/app/output" \
                $whisper_image_name ffmpeg -y -i \
                "/app/output/$file_name_without_ext.srt" \
                "/app/output/$file_name_without_ext.ass" >/dev/null 2>&1
@@ -171,17 +172,20 @@ for audio in "${audios[@]}"; do
     if [[ $? -ne 0 ]]; then
       exit 1
     fi
-
-    if [[ $output_format == "srt" ]]; then
-      rm "$output_dir/$file_name_without_ext.srt"
-    fi
   fi
 
   elapsed_time=$(($(date +%s) - start_time))
   echo "$audio elapsed time: $(date -d@${elapsed_time} -u +%H:%M:%S)"
   total_elapsed_time=$((total_elapsed_time + elapsed_time))
-
 done
+
+cp -r $tmp_dir/* $output_dir
+for audio in "${audios[@]}"; do
+    if [[ $output_format == "srt" ]]; then
+      rm "$output_dir/$file_name_without_ext.srt"
+    fi
+done
+
 echo "Total elapsed time: $(date -d@${total_elapsed_time} -u +%H:%M:%S)"
 
 echo "All steps completed successfully."
