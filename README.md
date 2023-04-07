@@ -113,7 +113,7 @@ win10用户（win11用户可跳过）：
 
 ![image](https://user-images.githubusercontent.com/5547526/230649915-39f93f0e-d3f6-49b7-9acf-4a067c1d0769.png)
 
-4. 进入项目里的src目录，双击运行 add_whisper_alias.sh
+4. 进入项目里的src目录，在目录里右键启动一个Terminal，然后运行 ./add_whisper_alias.sh，随即关闭该终端。
 
 # 使用
 
