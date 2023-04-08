@@ -2,5 +2,9 @@ version: '3'
 
 services:
   whisper:
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile-cn-mainland
+    volumes:
+      - ../src:/app/src
     image: ykw/whisper${ubuntu_version}
