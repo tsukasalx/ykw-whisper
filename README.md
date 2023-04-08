@@ -103,15 +103,15 @@ win10用户（win11用户可跳过）：
 
 1. 复制该仓库的地址
 
-![image](https://user-images.githubusercontent.com/5547526/230649222-2016d495-a8fb-4592-9fc2-e06afc0b499a.png)
+![image](https://user-images.githubusercontent.com/5547526/230733081-79bdc6b5-533d-4b14-98fe-6a2a0132944c.png)
 
 2. 在windows文件浏览器保存位置右键打开菜单，找到Git Clone...
 
-<img width="201" alt="image" src="https://user-images.githubusercontent.com/5547526/230649471-71ff7b7d-2315-480d-a11b-e2a30b203202.png">
+<img width="192" alt="image" src="https://user-images.githubusercontent.com/5547526/230734337-f7056ab7-11e3-401e-b26e-fd15311cdda4.png">
 
 3. 在新窗口中填入URL，确保选中Recursive选项，点击OK
 
-![image](https://user-images.githubusercontent.com/5547526/230649915-39f93f0e-d3f6-49b7-9acf-4a067c1d0769.png)
+![image](https://user-images.githubusercontent.com/5547526/230734236-97ca48cf-79bd-4934-8f39-cb7e25bb759a.png)
 
 4. 进入项目里的src目录，在目录里右键启动一个Terminal，然后运行 ./add_whisper_alias.sh，随即关闭该终端。
 
@@ -140,3 +140,7 @@ win10用户（win11用户可跳过）：
 | large  |   1550 M   |        N/A         |      `large`       |    ~10 GB     |       1x       |
 
 --device：默认为gpu，也可使用cpu
+
+# 注意
+
+1. 不要使用 ubuntu23 预览版
