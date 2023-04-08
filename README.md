@@ -103,7 +103,7 @@ win10用户（win11用户可跳过）：
 
 1. 复制该仓库的地址
 
-![image](https://user-images.githubusercontent.com/5547526/230649222-2016d495-a8fb-4592-9fc2-e06afc0b499a.png)
+![image](https://user-images.githubusercontent.com/5547526/230733081-79bdc6b5-533d-4b14-98fe-6a2a0132944c.png)
 
 2. 在windows文件浏览器保存位置右键打开菜单，找到Git Clone...
 
