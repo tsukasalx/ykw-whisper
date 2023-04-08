@@ -185,6 +185,17 @@ for audio in "${audios[@]}"; do
     if [[ $? -ne 0 ]]; then
       exit 1
     fi
+
+    if [[ $placeholder_mode -eq 1 ]]; then
+      docker run --rm \
+                  -v "$tmp_dir:/app/output" \
+                  $whisper_image_name python3 src/ass_filter.py \
+                  "/app/output/$file_name_without_ext.ass" \
+                  "/app/output/$file_name_without_ext.ass"
+      if [[ $? -ne 0 ]]; then
+        exit 1
+      fi
+    fi
   fi
 
   elapsed_time=$(($(date +%s) - start_time))

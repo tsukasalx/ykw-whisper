@@ -17,3 +17,7 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 RUN pip install git+https://github.com/openai/whisper.git
 
 RUN pip install pysubs2
+
+RUN pip install flake8
+
+COPY src /app/src

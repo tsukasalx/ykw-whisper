@@ -6,4 +6,5 @@ services:
     volumes:
       - ../.devcontainer:/app/.devcontainer
       - ../docker:/app/docker
+      - ../src:/app/src
     command: sleep infinity

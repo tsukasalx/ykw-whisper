@@ -3,8 +3,6 @@ version: '3'
 services:
   whisper:
     build:
-      context: .
-      dockerfile: ./Dockerfile-cn-mainland
-    volumes:
-      - ../src:/app/src
+      context: ..
+      dockerfile: docker/Dockerfile-cn-mainland
     image: ykw/whisper
