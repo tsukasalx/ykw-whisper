@@ -107,7 +107,7 @@ win10用户（win11用户可跳过）：
 
 2. 在windows文件浏览器保存位置右键打开菜单，找到Git Clone...
 
-<img width="201" alt="image" src="https://user-images.githubusercontent.com/5547526/230649471-71ff7b7d-2315-480d-a11b-e2a30b203202.png">
+![image](https://user-images.githubusercontent.com/5547526/230734236-97ca48cf-79bd-4934-8f39-cb7e25bb759a.png)
 
 3. 在新窗口中填入URL，确保选中Recursive选项，点击OK
 
@@ -140,3 +140,7 @@ win10用户（win11用户可跳过）：
 | large  |   1550 M   |        N/A         |      `large`       |    ~10 GB     |       1x       |
 
 --device：默认为gpu，也可使用cpu
+
+# 注意
+
+1. 不要使用 ubuntu23 预览版
