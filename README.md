@@ -95,6 +95,14 @@ win10用户（win11用户可跳过）：
 
 [下载并用默认选项安装TortoiseGit](https://tortoisegit.org/)
 
+安装完成后右键菜单打开设置
+
+<img width="370" alt="image" src="https://user-images.githubusercontent.com/5547526/230740680-15988d54-59c4-4f15-8d19-3f68002ae9eb.png">
+
+确保如下图所示的选项设置
+
+![image](https://user-images.githubusercontent.com/5547526/230740863-838c2f74-d779-4d19-85e3-2f46c62cea34.png)
+
 ## 7. Nvidia最新显卡驱动
 
 [下载安装最新驱动](https://www.nvidia.com/download/index.aspx)
@@ -111,7 +119,7 @@ win10用户（win11用户可跳过）：
 
 3. 在新窗口中填入URL，确保选中Recursive选项，点击OK
 
-![image](https://user-images.githubusercontent.com/5547526/230734236-97ca48cf-79bd-4934-8f39-cb7e25bb759a.png)
+![image](https://user-images.githubusercontent.com/5547526/230740933-9a04f4c3-604f-4f9c-b118-8ccae5356de0.png)
 
 4. 进入项目里的src目录，在目录里右键启动一个Terminal，然后运行 ./add_whisper_alias.sh，随即关闭该终端。
 
@@ -144,3 +152,4 @@ win10用户（win11用户可跳过）：
 # 注意
 
 1. 不要使用 ubuntu23 预览版
+2. 小心git工具克隆之后的换行符问题
