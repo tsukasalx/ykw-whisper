@@ -107,11 +107,11 @@ win10用户（win11用户可跳过）：
 
 2. 在windows文件浏览器保存位置右键打开菜单，找到Git Clone...
 
-![image](https://user-images.githubusercontent.com/5547526/230734236-97ca48cf-79bd-4934-8f39-cb7e25bb759a.png)
+<img width="192" alt="image" src="https://user-images.githubusercontent.com/5547526/230734337-f7056ab7-11e3-401e-b26e-fd15311cdda4.png">
 
 3. 在新窗口中填入URL，确保选中Recursive选项，点击OK
 
-![image](https://user-images.githubusercontent.com/5547526/230649915-39f93f0e-d3f6-49b7-9acf-4a067c1d0769.png)
+![image](https://user-images.githubusercontent.com/5547526/230734236-97ca48cf-79bd-4934-8f39-cb7e25bb759a.png)
 
 4. 进入项目里的src目录，在目录里右键启动一个Terminal，然后运行 ./add_whisper_alias.sh，随即关闭该终端。
 
