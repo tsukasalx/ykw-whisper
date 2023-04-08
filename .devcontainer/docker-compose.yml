@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  whisper:
+    container_name: whisper-dev
+    volumes:
+      - ../.devcontainer:/app/.devcontainer
+      - ../docker:/app/docker
+    command: sleep infinity
