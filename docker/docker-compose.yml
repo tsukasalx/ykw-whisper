@@ -7,4 +7,4 @@ services:
       dockerfile: ./Dockerfile-cn-mainland
     volumes:
       - ../src:/app/src
-    image: ykw/whisper${ubuntu_version}
+    image: ykw/whisper
