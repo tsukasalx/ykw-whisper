@@ -65,6 +65,9 @@ options="-o ./output --model_dir ./model"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
+      echo Args:
+      echo "--proxy <http://your-http-proxy:prot>"
+      echo
       echo "+--------------------------------------------------------------------------------------------------------------+"
       echo "| Available models and languages                                                                               |"
       echo "|--------------------------------------------------------------------------------------------------------------|"
@@ -105,6 +108,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --language)
       language="$2"
+      shift 2
+      ;;
+    --proxy)
+      export http_proxy="$2"
+      export https_proxy="$2"
       shift 2
       ;;
     -*)
