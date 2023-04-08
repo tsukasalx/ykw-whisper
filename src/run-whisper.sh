@@ -34,13 +34,11 @@ else
 fi
 
 # Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
-ubuntu_version=$(lsb_release -sr)
-export ubuntu_version
-whisper_image_name=ykw/whisper$ubuntu_version
+whisper_image_name=ykw/whisper
 
 if ! docker images | grep -q $whisper_image_name; then
   echo "$whisper_image_name image not found. Building..."
-  (cd $(dirname "$0")/../docker && docker-compose build --build-arg UBUNTU_VERSION=$ubuntu_version)
+  (cd $(dirname "$0")/../docker && docker-compose build)
 fi
 
 # Verify if build is successful, if not, exit with error
@@ -59,6 +57,7 @@ is_output_ass=1
 language="ja"
 audios=()
 
+placeholder_mode=1
 options="-o ./output --model_dir ./model"
 
 # Parse command-line options
@@ -66,7 +65,8 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
       echo Args:
-      echo "--proxy <http://your-http-proxy:prot>"
+      echo "--proxy <http://your-http-proxy:prot>   set the proxy"
+      echo "--placeholder <false>                   disable the place holder lines for translating"
       echo
       echo "+--------------------------------------------------------------------------------------------------------------+"
       echo "| Available models and languages                                                                               |"
@@ -113,6 +113,12 @@ while [[ $# -gt 0 ]]; do
     --proxy)
       export http_proxy="$2"
       export https_proxy="$2"
+      shift 2
+      ;;
+    --placeholder)
+      if [[ $2 == "false" ]]; then
+        placeholder_mode=0
+      fi
       shift 2
       ;;
     -*)
@@ -176,7 +182,6 @@ for audio in "${audios[@]}"; do
                $whisper_image_name ffmpeg -y -i \
                "/app/output/$file_name_without_ext.srt" \
                "/app/output/$file_name_without_ext.ass" >/dev/null 2>&1
-    
     if [[ $? -ne 0 ]]; then
       exit 1
     fi
