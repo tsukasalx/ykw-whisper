@@ -160,7 +160,7 @@ for audio in "${audios[@]}"; do
              --rm \
              -v "$host_audio:$docker_audio:ro" \
              -v "$tmp_dir:/app/output" \
-             -v "$model_dir:/app/model:ro" \
+             -v "$model_dir:/app/model" \
              $whisper_image_name whisper $options "$docker_audio"
                   
   if [[ $? -ne 0 ]]; then
