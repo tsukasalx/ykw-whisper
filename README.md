@@ -133,6 +133,14 @@ win10用户（win11用户可跳过）：
 
 `ykw-whisper file.mp4 file2.mp3`
 
+默认会开启空行模式，即一行原文，一行留空，原文不显示字幕
+
+![image](https://user-images.githubusercontent.com/5547526/230747426-98ec4021-a79a-49a5-a7d9-a48923543456.png)
+
+可以通过添加参数 --placeholder false 禁用该功能，就是原文显示的字幕了
+
+![image](https://user-images.githubusercontent.com/5547526/230747459-a92b6024-695e-4629-95cb-828862d518f3.png)
+
 # 参数选项
 
 -h：可查看并使用whisper的所有选项
