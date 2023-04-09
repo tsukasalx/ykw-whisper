@@ -203,7 +203,7 @@ for audio in "${audios[@]}"; do
   total_elapsed_time=$((total_elapsed_time + elapsed_time))
 done
 
-cp -r $tmp_dir/* $output_dir
+cp -f -r $tmp_dir/* $output_dir
 for audio in "${audios[@]}"; do
     if [[ $output_format == "srt" ]]; then
       rm "$output_dir/$file_name_without_ext.srt"
