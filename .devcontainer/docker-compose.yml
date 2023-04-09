@@ -7,4 +7,5 @@ services:
       - ../.devcontainer:/app/.devcontainer
       - ../docker:/app/docker
       - ../src:/app/src
+      - ../.env:/app/.env
     command: sleep infinity

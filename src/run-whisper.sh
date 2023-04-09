@@ -34,19 +34,32 @@ else
 fi
 
 # Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
-whisper_image_name=ykw/whisper
+source $(dirname $0)/../.env
+whisper_image_name=ykw-whisper
+whisper_image_tag=$MAJOR.$MINOR
+whisper_image_name_with_tag=$whisper_image_name:$whisper_image_tag
 
-if ! docker images | grep -q $whisper_image_name; then
-  echo "$whisper_image_name image not found. Building..."
+function find_image {
+  ver=$(docker images | grep $whisper_image_name | awk '{print $2}' | grep $whisper_image_tag)
+  if [[ -z $ver ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+if find_image -eq 0; then
+  echo "$whisper_image_name_with_tag image not found. Building..."
   (cd $(dirname "$0")/../docker && docker-compose build)
+  docker tag $whisper_image_name $whisper_image_name_with_tag
 fi
 
 # Verify if build is successful, if not, exit with error
-if ! docker images | grep -q $whisper_image_name; then
-  echo "Error: $whisper_image_name build failed." >&2
+if find_image -eq 0; then
+  echo "Error: $whisper_image_name_with_tag build failed." >&2
   exit 1
 else
-  echo "$whisper_image_name build successfully."
+  echo "$whisper_image_name_with_tag build successfully."
 fi
 
 output_dir="."
@@ -167,7 +180,7 @@ for audio in "${audios[@]}"; do
              -v "$host_audio:$docker_audio:ro" \
              -v "$tmp_dir:/app/output" \
              -v "$model_dir:/app/model" \
-             $whisper_image_name whisper $options "$docker_audio"
+             $whisper_image_name_with_tag whisper $options "$docker_audio"
                   
   if [[ $? -ne 0 ]]; then
     exit 1
@@ -179,7 +192,7 @@ for audio in "${audios[@]}"; do
     file_name_without_ext=${file_name%.*}
     docker run --rm \
                -v "$tmp_dir:/app/output" \
-               $whisper_image_name ffmpeg -y -i \
+               $whisper_image_name_with_tag ffmpeg -y -i \
                "/app/output/$file_name_without_ext.srt" \
                "/app/output/$file_name_without_ext.ass" >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
@@ -189,7 +202,7 @@ for audio in "${audios[@]}"; do
     if [[ $placeholder_mode -eq 1 ]]; then
       docker run --rm \
                   -v "$tmp_dir:/app/output" \
-                  $whisper_image_name python3 src/ass_filter.py \
+                  $whisper_image_name_with_tag python3 src/ass_filter.py \
                   "/app/output/$file_name_without_ext.ass" \
                   "/app/output/$file_name_without_ext.ass"
       if [[ $? -ne 0 ]]; then

@@ -1,8 +1,8 @@
-version: '3'
+version: '3.8'
 
 services:
   whisper:
     build:
       context: ..
       dockerfile: docker/Dockerfile-cn-mainland
-    image: ykw/whisper
+    image: ykw-whisper
