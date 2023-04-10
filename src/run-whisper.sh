@@ -33,8 +33,18 @@ else
   echo "docker-compose installed successfully."
 fi
 
-# Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
+# check update
 source $(dirname $0)/../.env
+
+source $(dirname $0)/shell_utils/src/version.sh
+check_update "$REMOTE_ENV_URL" "$MAJOR" "$MINOR" "$PATCH"
+
+if [[ $? -eq 1 ]]; then
+  source $(dirname $0)/shell_utils/src/update_repo.sh
+  update_repo "$(dirname $0)/.." "main" && exec /bin/bash $@
+fi
+
+# Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
 whisper_image_name=ykw-whisper
 whisper_image_tag=$MAJOR.$MINOR
 whisper_image_name_with_tag=$whisper_image_name:$whisper_image_tag
