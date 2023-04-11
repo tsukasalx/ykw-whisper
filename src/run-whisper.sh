@@ -77,7 +77,7 @@ if find_image -eq 0; then
 else
   echo "$whisper_image_name_with_tag build successfully."
 fi
-exit
+
 output_dir="."
 model_dir="$(dirname $0)/../models"
 model="large"
