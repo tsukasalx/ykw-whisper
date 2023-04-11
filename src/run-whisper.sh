@@ -37,16 +37,18 @@ fi
 source $(dirname $0)/../.env
 
 source $(dirname $0)/shell_utils/src/version.sh
-check_update "$REMOTE_ENV_URL" "$MAJOR" "$MINOR" "$PATCH"
+version_info=$(check_update "$REMOTE_ENV_URL" "$MAJOR" "$MINOR" "$PATCH")
+NEED_UPDATE=$?
 
-if [[ $? -eq 1 ]]; then
+if [[ $NEED_UPDATE -eq 1 ]]; then
   source $(dirname $0)/shell_utils/src/update_repo.sh
   update_repo "$(dirname $0)/.." "main" && exec /bin/bash $0 $@
 fi
 
 # Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
+version_info=($version_info)
 whisper_image_name=ykw-whisper
-whisper_image_tag=$MAJOR.$MINOR
+whisper_image_tag=${version_info[3]}.${version_info[4]}
 whisper_image_name_with_tag=$whisper_image_name:$whisper_image_tag
 
 function find_image {
@@ -60,7 +62,11 @@ function find_image {
 
 if find_image -eq 0; then
   echo "$whisper_image_name_with_tag image not found. Building..."
-  (cd $(dirname "$0")/../docker && docker-compose build)
+  if [ ${version_info[0]} -eq 1 ]; then
+    (cd $(dirname "$0")/../docker && docker-compose build --no-cache)
+  elif [ ${version_info[1]} -eq 1 ]; then
+    (cd $(dirname "$0")/../docker && docker-compose build)
+  fi
   docker tag $whisper_image_name $whisper_image_name_with_tag
 fi
 
@@ -71,7 +77,7 @@ if find_image -eq 0; then
 else
   echo "$whisper_image_name_with_tag build successfully."
 fi
-
+exit
 output_dir="."
 model_dir="$(dirname $0)/../models"
 model="large"
