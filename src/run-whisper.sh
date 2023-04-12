@@ -52,7 +52,7 @@ whisper_image_tag=${version_info[3]}.${version_info[4]}
 whisper_image_name_with_tag=$whisper_image_name:$whisper_image_tag
 
 function find_image {
-  ver=$(docker images | grep $whisper_image_name | awk '{print $2}' | grep $whisper_image_tag)
+  ver=$(docker images | grep $whisper_image_name | awk '{print $2}' | grep $1)
   if [[ -z $ver ]]; then
     return 0
   else
@@ -60,18 +60,20 @@ function find_image {
   fi
 }
 
-if find_image -eq 0; then
+if find_image "$whisper_image_tag" -eq 0; then
   echo "$whisper_image_name_with_tag image not found. Building..."
   if [ ${version_info[0]} -eq 1 ]; then
     (cd $(dirname "$0")/../docker && docker-compose build --no-cache)
   elif [ ${version_info[1]} -eq 1 ]; then
+    (cd $(dirname "$0")/../docker && docker-compose build)
+  elif find_image "latest" -eq 0; then
     (cd $(dirname "$0")/../docker && docker-compose build)
   fi
   docker tag $whisper_image_name $whisper_image_name_with_tag
 fi
 
 # Verify if build is successful, if not, exit with error
-if find_image -eq 0; then
+if find_image "$whisper_image_tag" -eq 0; then
   echo "Error: $whisper_image_name_with_tag build failed." >&2
   exit 1
 else
