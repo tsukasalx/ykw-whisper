@@ -45,39 +45,17 @@ if [[ $NEED_UPDATE -eq 1 ]]; then
   update_repo "$(dirname $0)/.." "main" && exec /bin/bash $0 $@
 fi
 
-# Check if ykw/whisper image exists, if not, build using docker-compose in ../docker/
+# build image
 version_info=($version_info)
-whisper_image_name=ykw-whisper
+
+source $(dirname $0)/shell_utils/src/docker_builder.sh
+whisper_image_name="ykw-whisper"
 whisper_image_tag=${version_info[3]}.${version_info[4]}
-whisper_image_name_with_tag=$whisper_image_name:$whisper_image_tag
-
-function find_image {
-  ver=$(docker images | grep $whisper_image_name | awk '{print $2}' | grep $1)
-  if [[ -z $ver ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-if find_image "$whisper_image_tag" -eq 0; then
-  echo "$whisper_image_name_with_tag image not found. Building..."
-  if [ ${version_info[0]} -eq 1 ]; then
-    (cd $(dirname "$0")/../docker && docker-compose build --no-cache)
-  elif [ ${version_info[1]} -eq 1 ]; then
-    (cd $(dirname "$0")/../docker && docker-compose build)
-  elif find_image "latest" -eq 0; then
-    (cd $(dirname "$0")/../docker && docker-compose build)
-  fi
-  docker tag $whisper_image_name $whisper_image_name_with_tag
-fi
+build_image $whisper_image_name $whisper_image_tag ${version_info[0]} ${version_info[1]}
 
 # Verify if build is successful, if not, exit with error
-if find_image "$whisper_image_tag" -eq 0; then
-  echo "Error: $whisper_image_name_with_tag build failed." >&2
+if [ $? -ne 0 ]; then
   exit 1
-else
-  echo "$whisper_image_name_with_tag build successfully."
 fi
 
 output_dir="."
