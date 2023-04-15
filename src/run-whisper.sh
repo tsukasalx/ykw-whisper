@@ -6,15 +6,16 @@ if ! [ -x "$(command -v docker)" ]; then
   echo "Installing docker..."
   curl -fsSL https://get.docker.com -o get-docker.sh
   sh get-docker.sh
+
+  # Verify if installation is successful, if not, exit with error
+  if ! [ -x "$(command -v docker)" ]; then
+    echo "Error: docker installation failed." >&2
+    exit 1
+  else
+    echo "docker installed successfully."
+  fi
 fi
 
-# Verify if installation is successful, if not, exit with error
-if ! [ -x "$(command -v docker)" ]; then
-  echo "Error: docker installation failed." >&2
-  exit 1
-else
-  echo "docker installed successfully."
-fi
 
 # Check if docker-compose is installed, if not, install the latest version
 if ! [ -x "$(command -v docker-compose)" ]; then
@@ -23,15 +24,16 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) \
        -o /usr/local/bin/docker-compose
   chmod +x /usr/local/bin/docker-compose
+  
+  # Verify if installation is successful, if not, exit with error
+  if ! [ -x "$(command -v docker-compose)" ]; then
+    echo "Error: docker-compose installation failed." >&2
+    exit 1
+  else
+    echo "docker-compose installed successfully."
+  fi
 fi
 
-# Verify if installation is successful, if not, exit with error
-if ! [ -x "$(command -v docker-compose)" ]; then
-  echo "Error: docker-compose installation failed." >&2
-  exit 1
-else
-  echo "docker-compose installed successfully."
-fi
 
 # check update
 source $(dirname $0)/../.env
