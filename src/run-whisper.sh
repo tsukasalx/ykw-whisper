@@ -51,6 +51,7 @@ version_info=($version_info)
 source $(dirname $0)/shell_utils/src/docker_builder.sh
 whisper_image_name="ykw-whisper"
 whisper_image_tag=${version_info[3]}.${version_info[4]}
+whisper_image_name_with_tag=$whisper_image_name:$whisper_image_tag
 build_image $whisper_image_name $whisper_image_tag ${version_info[0]} ${version_info[1]}
 
 # Verify if build is successful, if not, exit with error
@@ -89,7 +90,7 @@ while [[ $# -gt 0 ]]; do
       printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "large" "1550 M" "N/A" "large" "~10 GB" "1x"
       echo "+--------------------------------------------------------------------------------------------------------------+"
 
-      docker run --rm $whisper_image_name whisper --help
+      docker run --rm $whisper_image_name_with_tag whisper --help
       exit 0
       ;;
     -o|--output_dir)
