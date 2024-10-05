@@ -6,18 +6,12 @@ WORKDIR /app
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update
-RUN apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" keyboard-configuration
-RUN apt install -y git
-RUN apt install -y ffmpeg
-RUN apt install -y software-properties-common
-RUN apt install -y python3-pip
+RUN apt-get update && \
+    apt-get install -y git ffmpeg python3-pip && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
-RUN pip install git+https://github.com/openai/whisper.git
-
-RUN pip install pysubs2
-
-RUN pip install flake8
+RUN pip install git+https://github.com/openai/whisper.git && \
+    pip install pysubs2 && \
+    pip install flake8
 
 COPY src /app/src

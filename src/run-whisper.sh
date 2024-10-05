@@ -63,13 +63,12 @@ fi
 
 output_dir="."
 model_dir="$(dirname $0)/../models"
-model="large"
+model="turbo"
 output_format="srt"
 is_output_ass=1
 language="ja"
 audios=()
 
-placeholder_mode=1
 options="-o ./output --model_dir ./model"
 
 # Parse command-line options
@@ -78,7 +77,6 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       echo Args:
       echo "--proxy <http://your-http-proxy:prot>   set the proxy"
-      echo "--placeholder <false>                   disable the place holder lines for translating"
       echo
       echo "+--------------------------------------------------------------------------------------------------------------+"
       echo "| Available models and languages                                                                               |"
@@ -90,6 +88,7 @@ while [[ $# -gt 0 ]]; do
       printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "small" "244 M" "small.en" "small" "~2 GB" "~6x"
       printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "medium" "769 M" "medium.en" "medium" "~5 GB" "~2x"
       printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "large" "1550 M" "N/A" "large" "~10 GB" "1x"
+      printf "| %-10s | %-15s | %-19s | %-19s | %-15s | %-15s |\n" "turbo" "809 M" "N/A" "turbo" "~6 GB" "~8x"
       echo "+--------------------------------------------------------------------------------------------------------------+"
 
       docker run --rm $whisper_image_name_with_tag whisper --help
@@ -125,12 +124,6 @@ while [[ $# -gt 0 ]]; do
     --proxy)
       export http_proxy="$2"
       export https_proxy="$2"
-      shift 2
-      ;;
-    --placeholder)
-      if [[ $2 == "false" ]]; then
-        placeholder_mode=0
-      fi
       shift 2
       ;;
     -*)
@@ -198,15 +191,13 @@ for audio in "${audios[@]}"; do
       exit 1
     fi
 
-    if [[ $placeholder_mode -eq 1 ]]; then
-      docker run --rm \
-                  -v "$tmp_dir:/app/output" \
-                  $whisper_image_name_with_tag python3 src/ass_filter.py \
-                  "/app/output/$file_name_without_ext.ass" \
-                  "/app/output/$file_name_without_ext.ass"
-      if [[ $? -ne 0 ]]; then
-        exit 1
-      fi
+    docker run --rm \
+                -v "$tmp_dir:/app/output" \
+                $whisper_image_name_with_tag python3 src/ass_filter.py \
+                "/app/output/$file_name_without_ext.ass" \
+                "/app/output/$file_name_without_ext-work.ass"
+    if [[ $? -ne 0 ]]; then
+      exit 1
     fi
   fi
 

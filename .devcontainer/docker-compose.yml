@@ -7,5 +7,11 @@ services:
       - ../.devcontainer:/app/.devcontainer
       - ../docker:/app/docker
       - ../src:/app/src
+      - ../models:/app/models
       - ../.env:/app/.env
     command: sleep infinity
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
